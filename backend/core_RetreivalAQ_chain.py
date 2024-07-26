@@ -31,7 +31,10 @@ def run_llm(query: str) -> Any:
     return result
 
 if __name__ == "__main__": 
+    load_dotenv(find_dotenv(), override=True)
     response=run_llm(query="What is the RetrievalQA chain?")
     print(response)
     print("-"*100) 
     print(response["result"])
+    print("-"*100) 
+    print(response["source_documents"])

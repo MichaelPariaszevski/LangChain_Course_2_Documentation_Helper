@@ -14,7 +14,7 @@ from langchain_pinecone import PineconeVectorStore
 
 from functions.pinecone_index import insert_or_fetch_embeddings
 
-from constants import INDEX_NAME
+from backend.constants import INDEX_NAME
 
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
