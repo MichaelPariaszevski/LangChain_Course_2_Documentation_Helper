@@ -15,3 +15,5 @@ streamlit-chat
 tqdm 
 langchain-pinecone 
 langchain-openai 
+langchain-community
+python-dotenv
