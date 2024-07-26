@@ -25,14 +25,15 @@ def insert_or_fetch_embeddings(
     pc = pinecone.Pinecone()  # Pinecone api_key is added here
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small", dimensions=1536)
 
-    index_object = pc.Index(index_name)
+    if index_name in pc.list_indexes().names(): 
+        index_object = pc.Index(index_name)
 
     print(pc.list_indexes())
     print("-" * 50)
     print(pc.list_indexes().names())
     print("-" * 50)
 
-    if index_name.lower() == "all":
+    if index_name.lower() == "all" and delete == True:
         delete_pinecone_index(index_name="all")
         print(pc.list_indexes())
         return None
@@ -40,10 +41,10 @@ def insert_or_fetch_embeddings(
         index_name.lower() != "all"
         and index_name not in pc.list_indexes().names()
         and chunks == None
-        and delete != True
-        and have_vectors != True
+        and delete == False
+        and have_vectors == False
     ):
-        print(f"Creating index {index_name} and embeddings ...", end="")
+        print(f"Creating index {index_name}", end="")
         pc.create_index(
             name=index_name,
             dimension=1536,
@@ -51,6 +52,7 @@ def insert_or_fetch_embeddings(
             spec=PodSpec(environment="gcp-starter"),
         )
         print(f"Created index: {index_name}. Currently empty (no embedded vectors)")
+        return None
     elif (
         index_name.lower() != "all"
         and index_name in pc.list_indexes().names()
@@ -86,7 +88,7 @@ def insert_or_fetch_embeddings(
         index_name.lower() != "all"
         and index_name not in pc.list_indexes().names()
         and chunks != None
-        and delete != True
+        and delete == False
     ):
         print(f"Creating index {index_name} and embeddings ...", end="")
         pc.create_index(
@@ -107,6 +109,18 @@ def insert_or_fetch_embeddings(
 
 
 if __name__ == "__main__":
+    # import sys 
+    # import os 
+    # from dotenv import load_dotenv, find_dotenv
+
+    # load_dotenv(find_dotenv(), override=True)
+
+    # sys.path.append(os.getcwd())
+
+    # from constants import INDEX_NAME
+
+    # insert_or_fetch_embeddings(index_name=INDEX_NAME, have_vectors=False)
+
     from dotenv import load_dotenv, find_dotenv
 
     load_dotenv(find_dotenv(), override=True)
@@ -117,10 +131,10 @@ if __name__ == "__main__":
 
     index = pc.Index("langchain-doc-helper-index")
 
-    # index_info=index.describe_index_stats()
+    index_info=index.describe_index_stats()
 
     print(index.describe_index_stats()["total_vector_count"])
-    # print("-"*100)
-    # print(index)
-    # print("-"*100)
-    # print(type(index))
+    print("-"*100)
+    print(index)
+    print("-"*100)
+    print(type(index))

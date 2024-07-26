@@ -2,6 +2,9 @@ from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv(), override=True)
 
+import sys
+import os
+
 from langchain.chains.retrieval import create_retrieval_chain
 
 from langchain import hub
@@ -11,6 +14,10 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_pinecone import PineconeVectorStore
 
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+
+sys.path.append(
+    os.getcwd()
+)  # This line is necessary to import INDEX_NAME from constants (also, the directory of LangChain_Course_2_Documentation_Helper/LangChain_Course_2_Documentation_Helper is necessary)
 
 from constants import INDEX_NAME
 
@@ -36,7 +43,15 @@ def run_llm(query: str):
 
     result = qa_chain.invoke(input={"input": query})
 
-    return result
+    new_result = {
+        "query": result["input"],
+        "result": result["answer"],
+        "source_documents": result["context"],
+    }
+
+    # new_result["source_documents"]=[doc.metadata["source"].replace("documents\\", "") for doc in new_result["source_documents"]]
+
+    return new_result
 
 
 if __name__ == "__main__":
@@ -44,6 +59,8 @@ if __name__ == "__main__":
 
     print(res)
     print("-" * 100)
-    print(res["answer"])
+    print(res["result"])
+    print("-"*100) 
+    print(res["source_documents"])
     print("-" * 100)
-    print([doc.metadata["source"] for doc in res["context"]])
+    print([doc.metadata["source"] for doc in res["source_documents"]])
