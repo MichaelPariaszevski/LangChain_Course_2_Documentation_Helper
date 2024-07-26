@@ -14,6 +14,8 @@ from langchain_pinecone import PineconeVectorStore
 
 from functions.pinecone_index import insert_or_fetch_embeddings
 
+from constants import INDEX_NAME
+
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
 
@@ -34,7 +36,7 @@ def ingest_docs(index_name):
 
     for doc in documents:
         old_url = doc.metadata["source"]
-        new_url = old_url.replace("langchain-docs", "https:/")
+        new_url = old_url.replace("langchain-docs", "https:")
         doc.metadata.update({"source": new_url})
 
     print(f"Going to add len{documents} to Pinecone index: {index_name}") 
@@ -45,4 +47,4 @@ def ingest_docs(index_name):
 
 
 if __name__ == "__main__":
-    ingest_docs("langchain-doc-helper-index")
+    ingest_docs(INDEX_NAME)

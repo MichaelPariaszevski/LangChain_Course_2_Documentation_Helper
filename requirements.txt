@@ -16,4 +16,5 @@ tqdm
 langchain-pinecone 
 langchain-openai 
 langchain-community
+langchainhub
 python-dotenv
