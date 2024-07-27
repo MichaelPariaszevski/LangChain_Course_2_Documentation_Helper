@@ -1,3 +1,7 @@
+sys.path.append(os.getcwd())
+
+from main_with_memory import OPENAI_API_KEY
+
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv(), override=True)
@@ -23,19 +27,21 @@ sys.path.append(
 
 from constants import INDEX_NAME
 
-from typing import List, Tuple, Any, Dict
+from typing import List, Any, Dict
 
 index_name = INDEX_NAME
 
 
-def run_llm_with_memory(query: str, chat_history: List[Dict[str, Any]]=[]):
-    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+def run_llm_with_memory(query: str, chat_history: List[Dict[str, Any]] = []):
+    embeddings = OpenAIEmbeddings(
+        model="text-embedding-3-small", api_key=OPENAI_API_KEY
+    )
 
     docsearch = PineconeVectorStore(index_name=index_name, embedding=embeddings)
 
-    llm = ChatOpenAI(model_name="gpt-4o-mini")
+    llm = ChatOpenAI(model_name="gpt-4o-mini", api_key=OPENAI_API_KEY)
 
-    retrieval_qa_chat_prompt=hub.pull("langchain-ai/retrieval-qa-chat")
+    retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
 
     stuff_documents_chain = create_stuff_documents_chain(
         llm=llm, prompt=retrieval_qa_chat_prompt
@@ -43,7 +49,9 @@ def run_llm_with_memory(query: str, chat_history: List[Dict[str, Any]]=[]):
 
     rephrase_prompt = hub.pull("langchain-ai/chat-langchain-rephrase")
 
-    history_aware_retriever=create_history_aware_retriever(llm=llm, retriever=docsearch.as_retriever(), prompt=rephrase_prompt)
+    history_aware_retriever = create_history_aware_retriever(
+        llm=llm, retriever=docsearch.as_retriever(), prompt=rephrase_prompt
+    )
 
     qa_chain = create_retrieval_chain(
         retriever=history_aware_retriever, combine_docs_chain=stuff_documents_chain
@@ -68,7 +76,7 @@ if __name__ == "__main__":
     print(res)
     print("-" * 100)
     print(res["result"])
-    print("-"*100) 
+    print("-" * 100)
     print(res["source_documents"])
     print("-" * 100)
     print([doc.metadata["source"] for doc in res["source_documents"]])
