@@ -23,8 +23,9 @@ from constants import INDEX_NAME
 
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
-def ingest_docs(index_name):
-    loader = ReadTheDocsLoader(path="documents_2/langchain-docs", encoding="utf-8")
+
+def ingest_docs(index_name: str, file_path: str):
+    loader = ReadTheDocsLoader(path=file_path, encoding="utf-8")
 
     raw_documents = loader.load()
 
@@ -41,19 +42,23 @@ def ingest_docs(index_name):
     for doc in documents:
         old_url = doc.metadata["source"]
         new_url = old_url.replace("documents_2\langchain-docs\\", "https://")
-        doc.metadata.update({"source": new_url})
+        new_url_2 = new_url.replace("\\", "/")
+        doc.metadata.update({"source": new_url_2})
 
-    print(f"Going to add len{documents} to Pinecone index: {index_name}") 
+    print(f"Going to add len{documents} to Pinecone index: {index_name}")
 
-    insert_or_fetch_embeddings(index_name=index_name, delete=False, have_vectors=True, chunks=documents)
+    insert_or_fetch_embeddings(
+        index_name=index_name, delete=False, have_vectors=True, chunks=documents
+    )
 
     print("Loading to vectorstore done")
 
-    return(documents)
+    return documents
 
 
 if __name__ == "__main__":
-    docs=ingest_docs(INDEX_NAME)
-    print("-"*250) 
-    for doc in docs: 
-        print(doc.metadata["source"])
+    # insert_or_fetch_embeddings(index_name="all", delete=True)
+    docs = ingest_docs(index_name=INDEX_NAME, file_path="documents_2/langchain-docs")
+    print("-" * 250)
+    # for doc in docs:
+    #     print(doc.metadata["source"])
