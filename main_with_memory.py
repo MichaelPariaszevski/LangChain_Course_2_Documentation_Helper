@@ -4,7 +4,7 @@ import os
 
 os.environ["OPENAI_API_KEY"]=st.secrets["OPENAI_API_KEY"]
 os.environ["PINECONE_API_KEY"]=st.secrets["PINECONE_API_KEY"]
-os.environ["PYTHONPATH"]=st.secrets["PYTHONPATH"]
+# os.environ["PYTHONPATH"]=st.secrets["PYTHONPATH"]
 
 from backend.core_with_memory import run_llm_with_memory
 
