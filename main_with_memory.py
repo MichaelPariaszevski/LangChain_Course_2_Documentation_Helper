@@ -1,10 +1,10 @@
+import streamlit as st
+
 OPENAI_API_KEY=st.secrets["OPENAI_API_KEY"]
 
 from backend.core_with_memory import run_llm_with_memory
 
 from typing import Set
-
-import streamlit as st
 
 from streamlit_chat import message
 
