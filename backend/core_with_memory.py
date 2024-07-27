@@ -1,7 +1,5 @@
 sys.path.append(os.getcwd())
 
-from main_with_memory import OPENAI_API_KEY
-
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv(), override=True)
@@ -33,13 +31,11 @@ index_name = INDEX_NAME
 
 
 def run_llm_with_memory(query: str, chat_history: List[Dict[str, Any]] = []):
-    embeddings = OpenAIEmbeddings(
-        model="text-embedding-3-small", api_key=OPENAI_API_KEY
-    )
+    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
     docsearch = PineconeVectorStore(index_name=index_name, embedding=embeddings)
 
-    llm = ChatOpenAI(model_name="gpt-4o-mini", api_key=OPENAI_API_KEY)
+    llm = ChatOpenAI(model_name="gpt-4o-mini")
 
     retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
 
