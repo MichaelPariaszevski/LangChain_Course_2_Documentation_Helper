@@ -1,5 +1,3 @@
-sys.path.append(os.getcwd())
-
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv(), override=True)
