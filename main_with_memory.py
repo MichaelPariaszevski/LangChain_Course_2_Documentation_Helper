@@ -33,9 +33,9 @@ def create_sources_string(source_urls: Set[str]) -> str:
     return sources_string
 
 
-st.header("LangChain Documentation Helper Application")
+st.header("LangChain Documentation Helper")
 
-prompt = st.text_input("Prompt", placeholder="Enter your prompt here ... ")
+prompt = st.text_input("Prompt", placeholder="Enter your prompt about LangChain here ... ")    
 
 if (
     "chat_answers_history" not in st.session_state
@@ -47,36 +47,43 @@ if (
     st.session_state["chat_history"] = []
 
 if prompt:
-    with st.spinner("Generating Response ... "):
+    if prompt in st.session_state["user_prompt_history"]: 
+        formatted_response=f'The prompt: "{prompt}" has already been entered this session.\nPlease enter a new prompt or restart the session (reload the page).'
+        # st.session_state["chat_answers_history"].append(formatted_response)
+        # st.session_state["user_prompt_history"].append(prompt)
+        st.write(formatted_response)
+    else:
+        with st.spinner("Generating Response ... "):
 
-        generated_response = run_llm_with_memory(
-            query=prompt, chat_history=st.session_state["chat_history"]
-        )
+            generated_response = run_llm_with_memory(
+                query=prompt, chat_history=st.session_state["chat_history"]
+            )
 
-        sources = set(
-            [doc.metadata["source"] for doc in generated_response["source_documents"]]
-        )
+            sources = set(
+                [doc.metadata["source"] for doc in generated_response["source_documents"]]
+            )
 
-        sources_string = create_sources_string(sources)
+            sources_string = create_sources_string(sources)
 
-        formatted_response = f'{generated_response["result"]}\n\nSources:'
-        for i, source in enumerate(sources):
-            formatted_response += f"\n\n[Source {i+1}]({source})"
-        # formatted_response += '\n'.join([f'[Source {i+1}]({source})' for i, source in enumerate(sources)])
+            formatted_response = f'{generated_response["result"]}\n\nSources:'
+            for i, source in enumerate(sources):
+                formatted_response += f"\n\n[Source {i+1}]({source})"
+            # formatted_response += '\n'.join([f'[Source {i+1}]({source})' for i, source in enumerate(sources)])
 
-        st.session_state["user_prompt_history"].append(prompt)
+            if prompt not in st.session_state["user_prompt_history"]:
+                st.session_state["user_prompt_history"].append(prompt)
 
-        st.session_state["chat_answers_history"].append(formatted_response)
+            st.session_state["chat_answers_history"].append(formatted_response)
 
-        st.session_state["chat_history"].append(
-            ("human", prompt)
-        )  # LangChain likes/prefers tuples
+            st.session_state["chat_history"].append(
+                ("human", prompt)
+            )  # LangChain likes/prefers tuples
 
-        st.session_state["chat_history"].append(
-            ("ai", generated_response["result"])
-        )  # LangChain likes/prefers tuples
+            st.session_state["chat_history"].append(
+                ("ai", generated_response["result"])
+            )  # LangChain likes/prefers tuples
 
-        # st.write(formatted_response)
+            # st.write(formatted_response)
 
 if st.session_state["chat_answers_history"]:
     for user_query, generated_response in zip(
