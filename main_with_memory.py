@@ -1,10 +1,10 @@
-import streamlit as st 
+import streamlit as st
 
 import os
 
-from dotenv import load_dotenv, find_dotenv 
+from dotenv import load_dotenv, find_dotenv
 
-load_dotenv(find_dotenv(), override=True) 
+load_dotenv(find_dotenv(), override=True)
 
 # os.environ["OPENAI_API_KEY"]=st.secrets["OPENAI_API_KEY"]
 # os.environ["PINECONE_API_KEY"]=st.secrets["PINECONE_API_KEY"]
@@ -28,7 +28,7 @@ def create_sources_string(source_urls: Set[str]) -> str:
     sources_string = "sources:\n\n"
 
     for i, source in enumerate(sources_list):
-        sources_string += f"{i+1}: {source}\n\n"
+        sources_string += f"{i+1}: [Source]{source}\n\n"
 
     return sources_string
 
@@ -49,23 +49,32 @@ if (
 if prompt:
     with st.spinner("Generating Response ... "):
 
-        generated_response = run_llm_with_memory(query=prompt, chat_history=st.session_state["chat_history"])
+        generated_response = run_llm_with_memory(
+            query=prompt, chat_history=st.session_state["chat_history"]
+        )
 
         sources = set(
             [doc.metadata["source"] for doc in generated_response["source_documents"]]
         )
 
-        formatted_response = (
-            f'{generated_response["result"]}\n\n {create_sources_string(sources)}'
-        )
+        sources_string = create_sources_string(sources)
+
+        formatted_response = f'{generated_response["result"]}\n\nSources:'
+        for i, source in enumerate(sources):
+            formatted_response += f"\n\n[Source {i+1}]({source})"
+        # formatted_response += '\n'.join([f'[Source {i+1}]({source})' for i, source in enumerate(sources)])
 
         st.session_state["user_prompt_history"].append(prompt)
 
         st.session_state["chat_answers_history"].append(formatted_response)
 
-        st.session_state["chat_history"].append(("human", prompt)) # LangChain likes/prefers tuples
+        st.session_state["chat_history"].append(
+            ("human", prompt)
+        )  # LangChain likes/prefers tuples
 
-        st.session_state["chat_history"].append(("ai", generated_response["result"])) # LangChain likes/prefers tuples
+        st.session_state["chat_history"].append(
+            ("ai", generated_response["result"])
+        )  # LangChain likes/prefers tuples
 
         # st.write(formatted_response)
 
